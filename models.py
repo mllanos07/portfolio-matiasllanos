@@ -211,7 +211,7 @@ class Skill(BaseSection):
         super().__init__(id)
         self.name = name
         self.level = level
-        self.type = type
+        self.type = type  # "hard" / "soft" / "language"
 
     def to_dict(self):
         data = super().to_dict()
@@ -292,12 +292,13 @@ class Skill(BaseSection):
 class Project(BaseSection):
     table_name = "projects"
 
-    def __init__(self, id, name, date_label, description, link):
+    def __init__(self, id, name, date_label, description, link, image):
         super().__init__(id)
         self.name = name
         self.date_label = date_label
         self.description = description
         self.link = link
+        self.image = image  # ruta relativa (static/...) o URL
 
     def to_dict(self):
         data = super().to_dict()
@@ -306,6 +307,7 @@ class Project(BaseSection):
             "date_label": self.date_label,
             "description": self.description,
             "link": self.link,
+            "image": self.image,
         })
         return data
 
@@ -315,11 +317,25 @@ class Project(BaseSection):
         if not conn:
             return []
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(f"SELECT * FROM {cls.table_name} ORDER BY id DESC;")
+        cursor.execute("SELECT * FROM projects ORDER BY id DESC;")
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
         return [cls(**row) for row in rows]
+
+    @classmethod
+    def create(cls, name, date_label, description, link, image):
+        conn = get_db_connection()
+        if not conn:
+            return
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO projects (name, date_label, description, link, image) VALUES (%s,%s,%s,%s,%s);",
+            (name, date_label, description, link, image)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     @classmethod
     def from_id(cls, proj_id):
@@ -327,7 +343,7 @@ class Project(BaseSection):
         if not conn:
             return None
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(f"SELECT * FROM {cls.table_name} WHERE id=%s;", (proj_id,))
+        cursor.execute("SELECT * FROM projects WHERE id = %s;", (proj_id,))
         row = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -339,26 +355,8 @@ class Project(BaseSection):
             return
         cursor = conn.cursor()
         cursor.execute(
-            f"""UPDATE {self.table_name}
-                SET name=%s, date_label=%s, description=%s, link=%s
-                WHERE id=%s;""",
-            (self.name, self.date_label, self.description, self.link, self.id)
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-    @classmethod
-    def create(cls, name, date_label, description, link):
-        conn = get_db_connection()
-        if not conn:
-            return
-        cursor = conn.cursor()
-        cursor.execute(
-            f"""INSERT INTO {cls.table_name}
-                (name, date_label, description, link)
-                VALUES (%s,%s,%s,%s);""",
-            (name, date_label, description, link)
+            "UPDATE projects SET name=%s, date_label=%s, description=%s, link=%s, image=%s WHERE id=%s;",
+            (self.name, self.date_label, self.description, self.link, self.image, self.id)
         )
         conn.commit()
         cursor.close()
@@ -370,7 +368,7 @@ class Project(BaseSection):
         if not conn:
             return
         cursor = conn.cursor()
-        cursor.execute(f"DELETE FROM {cls.table_name} WHERE id=%s;", (proj_id,))
+        cursor.execute("DELETE FROM projects WHERE id=%s;", (proj_id,))
         conn.commit()
         cursor.close()
         conn.close()

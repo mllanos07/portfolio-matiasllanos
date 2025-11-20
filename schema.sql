@@ -38,8 +38,8 @@ VALUES (
     'Full Stack Developer Jr.',
     'Soy una persona que intenta ser cada dia mas responsable, proactiva y con muchas ganas de aprender. Me gusta trabajar en equipo y siempre estoy buscando maneras creativas de resolver problemas. En mi tiempo libre voy al gimnasio, lo que me ayuda a mantener disciplina, constancia y un buen estado físico y mental. Busco una oportunidad para seguir desarrollándome personal y profesionalmente.',
     'matiasjoel.llanos@gmail.com',
-    '+54 9 351 1234567',
-    'Los Durmientes 999',
+    '+54 9 351 2089597',
+    'Los Durmientes 464',
     'img/matias-logo.png'
 );
 
@@ -116,25 +116,37 @@ CREATE TABLE IF NOT EXISTS projects (
     name VARCHAR(150) NOT NULL,
     date_label VARCHAR(50),
     description TEXT,
-    link VARCHAR(255)
+    link VARCHAR(255),
+    image VARCHAR(255)
 );
 
-INSERT INTO projects (name, date_label, description, link) VALUES
+INSERT INTO projects (name, date_label, description, link, image) VALUES
 ('Portfolio web del secundario', '2025',
  'Aplicación web desarrollada con Flask para presentar datos personales, formación académica y experiencia, funcionando como portfolio profesional.',
- 'https://github.com/mllanos07/portfolio-matiasllanos.git'),
+ 'https://github.com/mllanos07/portafolio-matias',
+ 'img/portfolio.png'),
+
 ('Aplicación Copa Renault', '2025',
  'Sistema web para la gestión de la Copa Renault 2026, incluyendo administración de equipos, resultados y organización general del torneo.',
- 'https://github.com/mllanos07/copa-renault.git'),
-('Simulador de cobro', '2025',
- 'Aplicación que simula el proceso de cobro, permitiendo practicar operaciones básicas y el flujo de atención a clientes.',
- 'https://github.com/mllanos07/app_cobro.git'),
+ 'https://github.com/mllanos07/copa-renault.git',
+ 'img/copa_renault.png'),
+
+('Simulador de pagos en linea', '2025',
+ 'Aplicación web que permite simular el proceso de compra y pago de un comercio online, incorporando un flujo similar al de Mercado Pago. Incluye gestión de productos, cálculo automático de montos y validación del pago para practicar operaciones reales de cobro.',
+ 'https://github.com/mllanos07/app_cobro.git',
+ 'img/app-cobro.png'),
+
+
 ('Aula virtual', '2025',
  'Plataforma tipo aula virtual para la gestión de cursos, materiales y tareas, desarrollada como proyecto escolar.',
- 'https://github.com/mllanos07/aula-virtual.git'),
+ 'https://github.com/mllanos07/aula-virtual.git',
+ 'img/aula-virtual.png'),
+
 ('Taller mecánico', '2025',
  'Sitio web desarrollado con Python y Django para mostrar los servicios de un taller mecánico y administrar sus empleados y turnos.',
- 'https://github.com/mllanos07/taller-mecanico-django.git');
+ 'https://github.com/mllanos07/taller-mecanico-django.git',
+ 'img/taller_mecanico.png');
+
 
 -- Redes sociales
 CREATE TABLE IF NOT EXISTS social_links (

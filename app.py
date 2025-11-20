@@ -285,11 +285,19 @@ def add_project():
     date_label = request.form.get("date_label")
     description = request.form.get("description")
     link = request.form.get("link")
-    if name:
-        Project.create(name, date_label, description, link)
-        flash("Proyecto agregado.", "success")
-    else:
+    image = request.form.get("image") or ""  # evitar None
+
+    if not name:
         flash("Falta el nombre del proyecto.", "danger")
+        return redirect(url_for("index"))
+
+    try:
+        Project.create(name, date_label, description, link, image)
+        flash("Proyecto agregado.", "success")
+    except Exception as e:
+        print("Error creando proyecto:", e)
+        flash("Hubo un error al crear el proyecto.", "danger")
+
     return redirect(url_for("index"))
 
 
@@ -300,20 +308,32 @@ def edit_project(proj_id):
     if not proj:
         flash("Proyecto no encontrado.", "danger")
         return redirect(url_for("index"))
-    proj.name = request.form.get("name")
-    proj.date_label = request.form.get("date_label")
-    proj.description = request.form.get("description")
-    proj.link = request.form.get("link")
-    proj.update()
-    flash("Proyecto actualizado.", "success")
+
+    try:
+        proj.name = request.form.get("name")
+        proj.date_label = request.form.get("date_label")
+        proj.description = request.form.get("description")
+        proj.link = request.form.get("link")
+        proj.image = request.form.get("image") or ""  # si viene vacío, guardo string vacío
+
+        proj.update()
+        flash("Proyecto actualizado.", "success")
+    except Exception as e:
+        print("Error actualizando proyecto:", e)
+        flash("Hubo un error al actualizar el proyecto.", "danger")
+
     return redirect(url_for("index"))
 
 
 @app.route("/admin/project/<int:proj_id>/delete", methods=["POST"])
 @login_required
 def delete_project(proj_id):
-    Project.delete(proj_id)
-    flash("Proyecto eliminado.", "info")
+    try:
+        Project.delete(proj_id)
+        flash("Proyecto eliminado.", "info")
+    except Exception as e:
+        print("Error eliminando proyecto:", e)
+        flash("Hubo un error al eliminar el proyecto.", "danger")
     return redirect(url_for("index"))
 
 

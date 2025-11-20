@@ -582,12 +582,23 @@
         {% for p in projects %}
         <div class="col-md-6 mb-3">
             <div class="card h-100 project-card">
+
+                {% if p.image %}
+                    {% if p.image.startswith("http") %}
+                        <img src="{{ p.image }}" class="card-img-top" alt="Portada del proyecto">
+                    {% else %}
+                        <img src="{{ url_for('static', filename=p.image) }}" class="card-img-top" alt="Portada del proyecto">
+                    {% endif %}
+                {% endif %}
+
                 <div class="card-body d-flex flex-column">
+
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <h5 class="card-title">{{ p.name }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ p.date_label }}</h6>
                         </div>
+
                         {% if is_logged_in %}
                         <div class="btn-group btn-group-sm">
                             <button class="btn btn-outline-primary"
@@ -595,6 +606,7 @@
                                     data-bs-target="#projectEditModal-{{ p.id }}">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
+
                             <form method="post"
                                   action="{{ url_for('delete_project', proj_id=p.id) }}"
                                   onsubmit="return confirm('¿Eliminar proyecto?');">
@@ -605,7 +617,9 @@
                         </div>
                         {% endif %}
                     </div>
+
                     <p class="card-text mt-2 flex-grow-1">{{ p.description }}</p>
+
                     {% if p.link %}
                     <a href="{{ p.link }}" target="_blank" class="btn btn-outline-primary btn-sm mt-auto">
                         Ver evidencia
@@ -621,6 +635,7 @@
              aria-labelledby="projectEditModalLabel-{{ p.id }}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
+
                     <form method="post"
                           action="{{ url_for('edit_project', proj_id=p.id) }}">
                         <div class="modal-header">
@@ -630,33 +645,48 @@
                             <button type="button" class="btn-close"
                                     data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
+
                         <div class="modal-body">
+
                             <div class="mb-3">
                                 <label class="form-label">Nombre</label>
                                 <input type="text" name="name" class="form-control"
                                        value="{{ p.name }}" required>
                             </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Fecha</label>
                                 <input type="text" name="date_label" class="form-control"
                                        value="{{ p.date_label }}">
                             </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Descripción</label>
                                 <textarea name="description" class="form-control" rows="3">{{ p.description }}</textarea>
                             </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Link evidencia</label>
                                 <input type="url" name="link" class="form-control"
                                        value="{{ p.link }}">
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Imagen (archivo o URL externa)</label>
+                                <input type="text" name="image" class="form-control"
+                                       value="{{ p.image }}"
+                                       placeholder="img/miniatura.jpg o https://...">
+                            </div>
+
                         </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary"
                                     data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -670,41 +700,60 @@
          aria-labelledby="projectAddModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
+
                 <form method="post" action="{{ url_for('add_project') }}">
                     <div class="modal-header">
                         <h5 class="modal-title" id="projectAddModalLabel">Agregar proyecto</h5>
                         <button type="button" class="btn-close"
                                 data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
                     <div class="modal-body">
+
                         <div class="mb-3">
                             <label class="form-label">Nombre</label>
                             <input type="text" name="name" class="form-control" required>
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label">Fecha</label>
-                            <input type="text" name="date_label" class="form-control">
+                            <input type="text" name="date_label" class="form-control"
+                                   placeholder="2025">
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label">Descripción</label>
-                            <textarea name="description" class="form-control" rows="3"></textarea>
+                            <textarea name="description" class="form-control" rows="3"
+                                      placeholder="Breve descripción del proyecto"></textarea>
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label">Link evidencia</label>
-                            <input type="url" name="link" class="form-control">
+                            <input type="url" name="link" class="form-control"
+                                   placeholder="https://github.com/...">
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Imagen (archivo dentro de static/img o URL externa)</label>
+                            <input type="text" name="image" class="form-control"
+                                   placeholder="img/proyecto.jpg o https://...">
+                        </div>
+
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-success">Agregar</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
     {% endif %}
 </section>
+
 
 <hr>
 
