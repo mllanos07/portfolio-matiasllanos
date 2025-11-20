@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS projects (
 INSERT INTO projects (name, date_label, description, link) VALUES
 ('Portfolio web del secundario', '2025',
  'Aplicación web desarrollada con Flask para presentar datos personales, formación académica y experiencia, funcionando como portfolio profesional.',
- 'https://github.com/mllanos07/portfolio-matias.git'),
+ 'https://github.com/mllanos07/portfolio-matiasllanos.git'),
 ('Aplicación Copa Renault', '2025',
  'Sistema web para la gestión de la Copa Renault 2026, incluyendo administración de equipos, resultados y organización general del torneo.',
  'https://github.com/mllanos07/copa-renault.git'),
