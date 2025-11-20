@@ -1,0 +1,742 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Acerca de -->
+<section id="about" class="mb-5">
+    <div class="row align-items-center">
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+            {% if about and about.profile_image %}
+                {% if about.profile_image.startswith('http') %}
+                    <img src="{{ about.profile_image }}"
+                         alt="Foto perfil" class="profile-img">
+                {% else %}
+                    <img src="{{ url_for('static', filename=about.profile_image) }}"
+                         alt="Foto perfil" class="profile-img">
+                {% endif %}
+            {% else %}
+                <img src="{{ url_for('static', filename='img/matias-logo.png') }}"
+                     alt="Foto perfil" class="profile-img">
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2>Acerca de mí</h2>
+                    <h4 class="text-muted">
+                        {{ about.full_name if about else 'Tu nombre' }} - {{ about.title if about else 'Título' }}
+                    </h4>
+                </div>
+                {% if is_logged_in %}
+                    <a href="{{ url_for('edit_about') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                {% endif %}
+            </div>
+
+            <p class="mt-3">
+                {{ about.summary if about else 'Resumen profesional...' }}
+            </p>
+            <ul class="list-unstyled">
+                <li><i class="fa-solid fa-envelope"></i> {{ about.email }}</li>
+                <li><i class="fa-solid fa-phone"></i> {{ about.phone }}</li>
+                <li><i class="fa-solid fa-location-dot"></i> {{ about.address }}</li>
+            </ul>
+
+            <a href="{{ url_for('download_cv') }}" class="btn btn-outline-secondary btn-sm mt-2">
+                <i class="fa-solid fa-file-pdf"></i> Descargar CV
+            </a>
+        </div>
+    </div>
+</section>
+
+<hr>
+
+<!-- Educación -->
+<section id="education" class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Educación</h2>
+        {% if is_logged_in %}
+            <button class="btn btn-sm btn-success"
+                    data-bs-toggle="modal" data-bs-target="#educationAddModal">
+                <i class="fa-solid fa-plus"></i> Agregar
+            </button>
+        {% endif %}
+    </div>
+
+    {% for ed in education %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">{{ ed.degree }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ ed.institution }}
+                            {% if ed.year_start %}
+                                · {{ ed.year_start }}{% if ed.year_end %} - {{ ed.year_end }}{% endif %}
+                            {% endif %}
+                        </h6>
+                    </div>
+                    {% if is_logged_in %}
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#educationEditModal-{{ ed.id }}">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <form method="post"
+                              action="{{ url_for('delete_education', edu_id=ed.id) }}"
+                              onsubmit="return confirm('¿Eliminar registro de educación?');">
+                            <button class="btn btn-outline-danger" type="submit">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                <p class="card-text mt-2">{{ ed.description }}</p>
+            </div>
+        </div>
+
+        {% if is_logged_in %}
+        <!-- Modal editar educación -->
+        <div class="modal fade" id="educationEditModal-{{ ed.id }}" tabindex="-1"
+             aria-labelledby="educationEditModalLabel-{{ ed.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post"
+                          action="{{ url_for('edit_education', edu_id=ed.id) }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="educationEditModalLabel-{{ ed.id }}">
+                                Editar educación
+                            </h5>
+                            <button type="button" class="btn-close"
+                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Institución</label>
+                                <input type="text" name="institution" class="form-control"
+                                       value="{{ ed.institution }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Título / Carrera</label>
+                                <input type="text" name="degree" class="form-control"
+                                       value="{{ ed.degree }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea name="description" class="form-control" rows="3">{{ ed.description }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Año inicio</label>
+                                <input type="number" name="year_start" class="form-control"
+                                       value="{{ ed.year_start }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Año fin</label>
+                                <input type="number" name="year_end" class="form-control"
+                                       value="{{ ed.year_end }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+
+    {% if is_logged_in %}
+    <!-- Modal agregar educación -->
+    <div class="modal fade" id="educationAddModal" tabindex="-1"
+         aria-labelledby="educationAddModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{{ url_for('add_education') }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="educationAddModalLabel">Agregar educación</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Institución</label>
+                            <input type="text" name="institution" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Título / Carrera</label>
+                            <input type="text" name="degree" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="description" class="form-control" rows="3"
+                                      placeholder="Ej: Facultad Blas Pascal, estudiando Ingeniería en Sistemas, etc."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Año inicio</label>
+                            <input type="number" name="year_start" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Año fin</label>
+                            <input type="number" name="year_end" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<hr>
+
+<!-- Experiencia -->
+<section id="experience" class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Experiencia laboral</h2>
+        {% if is_logged_in %}
+        <button class="btn btn-sm btn-success"
+                data-bs-toggle="modal" data-bs-target="#experienceAddModal">
+            <i class="fa-solid fa-plus"></i> Agregar
+        </button>
+        {% endif %}
+    </div>
+
+    {% if experiences %}
+        {% for exp in experiences %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">{{ exp.role }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ exp.company }} ·
+                                {% if exp.year_start %}{{ exp.year_start }}{% endif %}
+                                {% if exp.year_end %} - {{ exp.year_end }}{% endif %}
+                                {% if exp.is_current %}(Actual){% endif %}
+                            </h6>
+                        </div>
+                        {% if is_logged_in %}
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#experienceEditModal-{{ exp.id }}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <form method="post"
+                                  action="{{ url_for('delete_experience', exp_id=exp.id) }}"
+                                  onsubmit="return confirm('¿Eliminar experiencia?');">
+                                <button class="btn btn-outline-danger" type="submit">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="card-text mt-2">{{ exp.description }}</p>
+                </div>
+            </div>
+
+            {% if is_logged_in %}
+            <!-- Modal editar experiencia -->
+            <div class="modal fade" id="experienceEditModal-{{ exp.id }}" tabindex="-1"
+                 aria-labelledby="experienceEditModalLabel-{{ exp.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="post"
+                              action="{{ url_for('edit_experience', exp_id=exp.id) }}">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="experienceEditModalLabel-{{ exp.id }}">
+                                    Editar experiencia
+                                </h5>
+                                <button type="button" class="btn-close"
+                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Rol</label>
+                                    <input type="text" name="role" class="form-control"
+                                           value="{{ exp.role }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Empresa</label>
+                                    <input type="text" name="company" class="form-control"
+                                           value="{{ exp.company }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Descripción</label>
+                                    <textarea name="description" class="form-control" rows="3">{{ exp.description }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Año inicio</label>
+                                    <input type="number" name="year_start" class="form-control"
+                                           value="{{ exp.year_start }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Año fin</label>
+                                    <input type="number" name="year_end" class="form-control"
+                                           value="{{ exp.year_end }}">
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="is_current" id="isCurrent{{ exp.id }}"
+                                           {% if exp.is_current %}checked{% endif %}>
+                                    <label class="form-check-label" for="isCurrent{{ exp.id }}">
+                                        Trabajo actual
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>Todavía no cargaste experiencia laboral.</p>
+    {% endif %}
+
+    {% if is_logged_in %}
+    <!-- Modal agregar experiencia -->
+    <div class="modal fade" id="experienceAddModal" tabindex="-1"
+         aria-labelledby="experienceAddModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{{ url_for('add_experience') }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="experienceAddModalLabel">Agregar experiencia</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Rol</label>
+                            <input type="text" name="role" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Empresa</label>
+                            <input type="text" name="company" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Año inicio</label>
+                            <input type="number" name="year_start" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Año fin</label>
+                            <input type="number" name="year_end" class="form-control">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_current" id="isCurrentNew">
+                            <label class="form-check-label" for="isCurrentNew">
+                                Trabajo actual
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<hr>
+
+<!-- Hard & Soft Skills -->
+<section id="skills" class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Hard &amp; Soft Skills</h2>
+        {% if is_logged_in %}
+        <button class="btn btn-sm btn-success"
+                data-bs-toggle="modal" data-bs-target="#skillAddModal">
+            <i class="fa-solid fa-plus"></i> Agregar
+        </button>
+        {% endif %}
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <h5>Hard skills</h5>
+            {% for s in hard_skills %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ s.name }}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span>{{ s.level }}%</span>
+                            {% if is_logged_in %}
+                            <button class="btn btn-sm btn-outline-primary"
+                                    title="Editar"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#skillEditModal-{{ s.id }}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <form method="post"
+                                  action="{{ url_for('delete_skill', skill_id=s.id) }}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar skill?');">
+                                <button class="btn btn-sm btn-outline-danger" type="submit" title="Eliminar">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ s.level }}%;"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-4 mb-3">
+            <h5>Soft skills</h5>
+            {% for s in soft_skills %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ s.name }}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span>{{ s.level }}%</span>
+                            {% if is_logged_in %}
+                            <button class="btn btn-sm btn-outline-primary"
+                                    title="Editar"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#skillEditModal-{{ s.id }}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <form method="post"
+                                  action="{{ url_for('delete_skill', skill_id=s.id) }}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar skill?');">
+                                <button class="btn btn-sm btn-outline-danger" type="submit" title="Eliminar">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: {{ s.level }}%;"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-4 mb-3">
+            <h5>Idiomas</h5>
+            {% for s in languages %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ s.name }}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span>{{ s.level }}%</span>
+                            {% if is_logged_in %}
+                            <button class="btn btn-sm btn-outline-primary"
+                                    title="Editar"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#skillEditModal-{{ s.id }}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <form method="post"
+                                  action="{{ url_for('delete_skill', skill_id=s.id) }}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar skill?');">
+                                <button class="btn btn-sm btn-outline-danger" type="submit" title="Eliminar">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width: {{ s.level }}%;"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if is_logged_in %}
+    <!-- Modal agregar skill -->
+    <div class="modal fade" id="skillAddModal" tabindex="-1"
+         aria-labelledby="skillAddModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{{ url_for('add_skill') }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="skillAddModalLabel">Agregar skill</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nivel (%)</label>
+                            <input type="number" name="level" class="form-control"
+                                   value="50" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <select name="type" class="form-select">
+                                <option value="hard">Hard</option>
+                                <option value="soft">Soft</option>
+                                <option value="language">Idioma</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales para editar skills (uno por cada skill) -->
+    {% for s in skills %}
+    <div class="modal fade" id="skillEditModal-{{ s.id }}" tabindex="-1"
+         aria-labelledby="skillEditModalLabel-{{ s.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post"
+                      action="{{ url_for('edit_skill', skill_id=s.id) }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="skillEditModalLabel-{{ s.id }}">
+                            Editar skill
+                        </h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="name" class="form-control"
+                                   value="{{ s.name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nivel (%)</label>
+                            <input type="number" name="level" class="form-control"
+                                   value="{{ s.level }}" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <select name="type" class="form-select">
+                                <option value="hard" {% if s.type == 'hard' %}selected{% endif %}>Hard</option>
+                                <option value="soft" {% if s.type == 'soft' %}selected{% endif %}>Soft</option>
+                                <option value="language" {% if s.type == 'language' %}selected{% endif %}>Idioma</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</section>
+
+<hr>
+
+<!-- Proyectos -->
+<section id="projects" class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Proyectos</h2>
+        {% if is_logged_in %}
+        <button class="btn btn-sm btn-success"
+                data-bs-toggle="modal" data-bs-target="#projectAddModal">
+            <i class="fa-solid fa-plus"></i> Agregar
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for p in projects %}
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 project-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">{{ p.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ p.date_label }}</h6>
+                        </div>
+                        {% if is_logged_in %}
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#projectEditModal-{{ p.id }}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <form method="post"
+                                  action="{{ url_for('delete_project', proj_id=p.id) }}"
+                                  onsubmit="return confirm('¿Eliminar proyecto?');">
+                                <button class="btn btn-outline-danger" type="submit">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="card-text mt-2 flex-grow-1">{{ p.description }}</p>
+                    {% if p.link %}
+                    <a href="{{ p.link }}" target="_blank" class="btn btn-outline-primary btn-sm mt-auto">
+                        Ver evidencia
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if is_logged_in %}
+        <!-- Modal editar proyecto -->
+        <div class="modal fade" id="projectEditModal-{{ p.id }}" tabindex="-1"
+             aria-labelledby="projectEditModalLabel-{{ p.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post"
+                          action="{{ url_for('edit_project', proj_id=p.id) }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="projectEditModalLabel-{{ p.id }}">
+                                Editar proyecto
+                            </h5>
+                            <button type="button" class="btn-close"
+                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" name="name" class="form-control"
+                                       value="{{ p.name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Fecha</label>
+                                <input type="text" name="date_label" class="form-control"
+                                       value="{{ p.date_label }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea name="description" class="form-control" rows="3">{{ p.description }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Link evidencia</label>
+                                <input type="url" name="link" class="form-control"
+                                       value="{{ p.link }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    {% if is_logged_in %}
+    <!-- Modal agregar proyecto -->
+    <div class="modal fade" id="projectAddModal" tabindex="-1"
+         aria-labelledby="projectAddModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{{ url_for('add_project') }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="projectAddModalLabel">Agregar proyecto</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha</label>
+                            <input type="text" name="date_label" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Link evidencia</label>
+                            <input type="url" name="link" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<hr>
+
+<!-- Contacto con iframe (diseño estético, cumple requisito iframe) -->
+<section id="contact" class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Contacto</h2>
+        {% if is_logged_in %}
+        <a href="{{ url_for('edit_about') }}" class="btn btn-sm btn-outline-primary">
+            <i class="fa-solid fa-pen"></i> Editar datos de contacto
+        </a>
+        {% endif %}
+    </div>
+
+    <p>Podés contactarme por correo o buscar mi ubicación aproximada en el mapa.</p>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <ul class="list-unstyled">
+                <li><i class="fa-solid fa-envelope"></i> {{ about.email }}</li>
+                <li><i class="fa-solid fa-phone"></i> {{ about.phone }}</li>
+                <li><i class="fa-solid fa-location-dot"></i> {{ about.address }}</li>
+            </ul>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="ratio ratio-16x9">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3395.747624601281!2d-64.199!3d-31.417!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9432a287f9f82f3b%3A0x1b7466b9ad1b94e3!2sC%C3%B3rdoba!5e0!3m2!1ses-419!2sar!4v1700000000000"
+                    style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
