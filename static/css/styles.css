@@ -64,16 +64,16 @@ body {
     border-radius: 0.75rem;
 }
 
-/* Proyectos: leve efecto hover */
 .project-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    background: linear-gradient(1deg, #ececee, #aeaeaf);
+    background: linear-gradient(135deg, #ececec, #d8d8d8);
 }
 
 .project-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
+
 
 /* Responsive */
 @media (max-width: 767px) {
@@ -89,3 +89,22 @@ body {
 section {
     scroll-margin-top: 100px;
 }
+
+/* Animación de carga para barras de skills */
+.skill-bar {
+    height: 12px;
+    background-color: #e5e5e5;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.skill-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: #0d6efd;
+    transition: width 1s ease-in-out;
+    border-radius: 5px;
+}
+
+.skill-soft { background-color: #198754; }
+.skill-lang { background-color: #0dcaf0; }

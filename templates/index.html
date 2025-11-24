@@ -403,8 +403,8 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="progress">
-                        <div class="progress-bar" style="width: {{ s.level }}%;"></div>
+                    <div class="skill-bar">
+                        <div class="skill-bar-fill" data-level="{{ s.level }}"></div>
                     </div>
                 </div>
             {% endfor %}
@@ -435,8 +435,8 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="progress">
-                        <div class="progress-bar bg-success" style="width: {{ s.level }}%;"></div>
+                    <div class="skill-bar">
+                        <div class="skill-bar-fill skill-soft" data-level="{{ s.level }}"></div>
                     </div>
                 </div>
             {% endfor %}
@@ -467,8 +467,8 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="progress">
-                        <div class="progress-bar bg-info" style="width: {{ s.level }}%;"></div>
+                    <div class="skill-bar">
+                        <div class="skill-bar-fill skill-lang" data-level="{{ s.level }}"></div>
                     </div>
                 </div>
             {% endfor %}
