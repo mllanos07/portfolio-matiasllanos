@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 
-# Decorador simple para proteger rutas de edición
+# decorador simple para proteger rutas de edicion
 def login_required(view_func):
     @wraps(view_func)
     def wrapper(*args, **kwargs):
@@ -46,7 +46,7 @@ def index():
     projects = Project.all()
     social_links = SocialLink.all()
 
-    # separo skills por tipo para mostrarlas más lindo
+    # separo skills por tipo para mostrarlas mas lindo
     hard_skills = [s for s in skills if s.type == "hard"]
     soft_skills = [s for s in skills if s.type == "soft"]
     languages = [s for s in skills if s.type == "language"]
@@ -61,7 +61,7 @@ def index():
         languages=languages,
         projects=projects,
         social_links=social_links,
-        skills=skills,  # lista completa, para los modales de edición
+        skills=skills,  # lista completa para los modales de edicion
     )
 
 
@@ -88,13 +88,13 @@ def logout():
 
 @app.route("/download_cv")
 def download_cv():
-    # Descarga del CV en PDF
+    # descarga del CV en PDF
     uploads_dir = os.path.join(app.root_path, "static", "uploads")
     filename = "Modern Professional CV Resume.pdf"
     return send_from_directory(uploads_dir, filename, as_attachment=True)
 
 
-# ---- Rutas de edición ----
+# Rutas de edicion
 
 @app.route("/admin/about", methods=["GET", "POST"])
 @login_required
@@ -125,7 +125,7 @@ def edit_about():
     return render_template("about_edit.html", form=form, about=about)
 
 
-# ---- Experiencia ----
+# Experiencia
 
 @app.route("/admin/experience/add", methods=["POST"])
 @login_required
@@ -170,7 +170,7 @@ def delete_experience(exp_id):
     return redirect(url_for("index"))
 
 
-# ---- Educación ----
+# Educación
 
 @app.route("/admin/education/add", methods=["POST"])
 @login_required
@@ -213,7 +213,7 @@ def delete_education(edu_id):
     return redirect(url_for("index"))
 
 
-# ---- Skills ----
+# Skills
 
 @app.route("/admin/skill/add", methods=["POST"])
 @login_required
@@ -276,7 +276,7 @@ def delete_skill(skill_id):
     return redirect(url_for("index"))
 
 
-# ---- Proyectos ----
+# Proyectos
 
 @app.route("/admin/project/add", methods=["POST"])
 @login_required
@@ -338,5 +338,5 @@ def delete_project(proj_id):
 
 
 if __name__ == "__main__":
-    # Para desarrollo local
+    # para desarrollo local
     app.run(debug=True)

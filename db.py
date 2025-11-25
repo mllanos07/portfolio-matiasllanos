@@ -16,6 +16,6 @@ def get_db_connection():
         )
         return conn
     except Error as e:
-        # En un proyecto real esto iría a logs
+        # en un proyecto real esto iria a logs
         print("Error conectando a MySQL:", e)
         return None

@@ -15,6 +15,5 @@ class AboutForm(FlaskForm):
     email = StringField("Email", validators=[Email()])
     phone = StringField("Teléfono")
     address = StringField("Dirección")
-    # 👉 cambio acá: aclaramos que puede ser archivo o URL
     profile_image = StringField("Ruta imagen (archivo o URL)")
     submit = SubmitField("Guardar cambios")
