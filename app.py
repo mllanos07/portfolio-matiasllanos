@@ -314,7 +314,7 @@ def edit_project(proj_id):
         proj.date_label = request.form.get("date_label")
         proj.description = request.form.get("description")
         proj.link = request.form.get("link")
-        proj.image = request.form.get("image") or ""  # si viene vacío, guardo string vacío
+        proj.image = request.form.get("image") or ""  
 
         proj.update()
         flash("Proyecto actualizado.", "success")

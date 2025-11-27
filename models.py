@@ -2,17 +2,17 @@ from db import get_db_connection
 import hashlib
 
 # POO - ABSTRACCIÓN:
-# Clase base para varias secciones del portfolio.
+# Clase base para varias secciones del portfolio (reutilizable y ofrece interfaz común).
 class BaseSection:
     def __init__(self, id=None):
         self._id = id  # POO - ENCAPSULAMIENTO (atributo "privado")
 
-    @property
+    @property       # Permite acceder al obj.id pero no asignar
     def id(self):
         return self._id
 
     def to_dict(self):
-        """Método genérico, ideal para usar en plantillas."""
+        # Método genericó convierte objeto en dic mínimo
         return {"id": self._id}
 
 
